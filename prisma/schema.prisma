@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  dueDate   String
+  updatedAt DateTime @updatedAt
+  name      String
+  content   String
+}
+
+// PK: id , FK: authorId (fait référence au champ "id" du modèle User). On met en place la FK grâce à "@relation". 
+// la directive "onDelete:Cascade" permet de supprimer les notes associés si on supprime le user. 
+
+model User {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  username     String   @unique
+  passwordHash String
+  notes        Note[]
+}
+
+//On type "notes" en Note[] (référence au modèle "Note" pour pouvoir stocker toutes les notes de l'user. 
